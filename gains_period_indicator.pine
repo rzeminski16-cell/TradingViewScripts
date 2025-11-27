@@ -58,11 +58,7 @@ if bar_index >= periodLength - 1
                 boxBottom := math.min(boxBottom, low[j])
 
             // Draw box using bar_index coordinates
-            box.new(left=startBarIndex, top=boxTop, right=endBarIndex, bottom=boxBottom,
-                    xloc=xloc.bar_index,
-                    border_color=na,
-                    bgcolor=highlightColor,
-                    extend=extend.none)
+            box.new(left=startBarIndex, top=boxTop, right=endBarIndex, bottom=boxBottom, xloc=xloc.bar_index, border_color=na, bgcolor=highlightColor, extend=extend.none)
 
             // Skip forward by periodLength days from the start bar
             lastPeriodEnd := potentialStartBar + periodLength

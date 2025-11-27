@@ -73,21 +73,15 @@ if bar_index >= periodLength - 1
             // Draw box using bar_index coordinates
             box.new(left=startBarIndex, top=boxTop, right=endBarIndex, bottom=boxBottom, xloc=xloc.bar_index, border_color=na, bgcolor=highlightColor, extend=extend.none)
 
+            // Add labels showing candle position for each bar in the qualifying period
+            for position = 1 to periodLength
+                labelBarIndex = startBarIndex + position - 1
+                labelTime = time[bar_index - labelBarIndex]
+                labelPrice = low[bar_index - labelBarIndex]
+                label.new(x=labelBarIndex, y=labelPrice, text=str.tostring(position), xloc=xloc.bar_index, yloc=yloc.belowbar, color=color.new(color.blue, 50), textcolor=color.white, size=size.tiny, style=label.style_label_up)
+
             // Skip forward by periodLength days from the start bar
             lastPeriodEnd := potentialStartBar + periodLength
-
-// Calculate candle position value
-candlePosition = -1
-if array.size(qualifyingPeriods) > 0
-    for i = 0 to array.size(qualifyingPeriods) - 1
-        periodStart = array.get(qualifyingPeriods, i)
-        periodEnd = periodStart + periodLength - 1
-        if bar_index >= periodStart and bar_index <= periodEnd
-            candlePosition := bar_index - periodStart + 1
-            break
-
-// Plot the candle position value
-plot(candlePosition, title="Candle Position", display=display.data_window)
 
 // Create table to show quarterly counts
 var table statsTable = na

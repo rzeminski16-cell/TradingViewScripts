@@ -1,4 +1,4 @@
-//@version=5
+//@version=6
 indicator("Gains Period Highlighter", overlay=true)
 
 // Input parameters
@@ -46,9 +46,9 @@ if bar_index >= periodLength - 1
             array.push(qualifyingYears, barYear)
             array.push(qualifyingQuarters, barQuarter)
 
-            // Draw a box to highlight the entire period
-            startTime = time[periodLength - 1]
-            endTime = time
+            // Draw a box to highlight the entire period using bar indices
+            startBarIndex = bar_index - periodLength + 1
+            endBarIndex = bar_index
             boxTop = high[periodLength - 1]
             boxBottom = low[periodLength - 1]
 
@@ -57,8 +57,9 @@ if bar_index >= periodLength - 1
                 boxTop := math.max(boxTop, high[j])
                 boxBottom := math.min(boxBottom, low[j])
 
-            // Draw box with some padding
-            box.new(startTime, boxTop, endTime, boxBottom,
+            // Draw box using bar_index coordinates
+            box.new(left=startBarIndex, top=boxTop, right=endBarIndex, bottom=boxBottom,
+                    xloc=xloc.bar_index,
                     border_color=na,
                     bgcolor=highlightColor,
                     extend=extend.none)

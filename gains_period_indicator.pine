@@ -76,6 +76,19 @@ if bar_index >= periodLength - 1
             // Skip forward by periodLength days from the start bar
             lastPeriodEnd := potentialStartBar + periodLength
 
+// Calculate candle position value
+candlePosition = -1
+if array.size(qualifyingPeriods) > 0
+    for i = 0 to array.size(qualifyingPeriods) - 1
+        periodStart = array.get(qualifyingPeriods, i)
+        periodEnd = periodStart + periodLength - 1
+        if bar_index >= periodStart and bar_index <= periodEnd
+            candlePosition := bar_index - periodStart + 1
+            break
+
+// Plot the candle position value
+plot(candlePosition, title="Candle Position", display=display.data_window)
+
 // Create table to show quarterly counts
 var table statsTable = na
 

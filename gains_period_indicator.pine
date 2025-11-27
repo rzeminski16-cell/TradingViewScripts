@@ -87,7 +87,7 @@ if array.size(qualifyingPeriods) > 0
             break
 
 // Plot the candle position value (hidden from chart, but included in CSV export)
-plot(candlePosition, title="Candle Position", display=display.data_window)
+plot(candlePosition, title="candle_position", display=display.data_window)
 
 // Create table to show quarterly counts
 var table statsTable = na

@@ -97,8 +97,27 @@ if barstate.islast
             else
                 map.put(quarterCounts, key, currentCount + 1)
 
-    // Build table with correct dimensions
-    numQuarters = map.size(quarterCounts)
+    // Build list of all quarters in the range
+    var array<string> allQuarters = array.new<string>()
+    var array<int> allCounts = array.new<int>()
+
+    array.clear(allQuarters)
+    array.clear(allCounts)
+
+    // Iterate through all quarters in the range
+    for yr = startYear to endYear
+        startQ = (yr == startYear) ? startQuarter : 1
+        endQ = (yr == endYear) ? endQuarter : 4
+
+        for q = startQ to endQ
+            quarterKey = str.tostring(yr) + " Q" + str.tostring(q)
+            count = map.get(quarterCounts, quarterKey)
+
+            array.push(allQuarters, quarterKey)
+            array.push(allCounts, na(count) ? 0 : count)
+
+    // Build table with all quarters in range
+    numQuarters = array.size(allQuarters)
 
     if numQuarters > 0
         // Delete old table and create new one with correct size (header + data rows)
@@ -111,21 +130,15 @@ if barstate.islast
         table.cell(statsTable, 1, 0, "Count", bgcolor=color.gray, text_color=color.white, text_size=size.small)
 
         // Data rows
-        row = 1
-        keys = map.keys(quarterCounts)
-        values = map.values(quarterCounts)
+        for i = 0 to numQuarters - 1
+            quarterKey = array.get(allQuarters, i)
+            count = array.get(allCounts, i)
 
-        for i = 0 to array.size(keys) - 1
-            quarterKey = array.get(keys, i)
-            count = array.get(values, i)
-
-            table.cell(statsTable, 0, row, quarterKey, bgcolor=color.white, text_color=color.black, text_size=size.small)
-            table.cell(statsTable, 1, row, str.tostring(count), bgcolor=color.white, text_color=color.black, text_size=size.small)
-            row := row + 1
+            table.cell(statsTable, 0, i + 1, quarterKey, bgcolor=color.white, text_color=color.black, text_size=size.small)
+            table.cell(statsTable, 1, i + 1, str.tostring(count), bgcolor=color.white, text_color=color.black, text_size=size.small)
     else
         // Delete old table and create simple message table
         if not na(statsTable)
             table.delete(statsTable)
         statsTable := table.new(position.top_right, 1, 1, border_width=1)
-        message = array.size(qualifyingPeriods) > 0 ? "No periods in selected range" : "No qualifying periods found"
-        table.cell(statsTable, 0, 0, message, bgcolor=color.white, text_color=color.black, text_size=size.small)
+        table.cell(statsTable, 0, 0, "Invalid quarter range", bgcolor=color.white, text_color=color.black, text_size=size.small)

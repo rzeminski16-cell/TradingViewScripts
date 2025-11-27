@@ -63,12 +63,9 @@ if array.size(qualifyingPeriods) > 0
 bgcolor(isInQualifyingPeriod ? highlightColor : na)
 
 // Create table to show quarterly counts
-var table statsTable = table.new(position.top_right, 3, 1, border_width=1)
+var table statsTable = na
 
 if barstate.islast
-    // Clear table
-    table.clear(statsTable, 0, 0, 2, 0)
-
     // Count periods by quarter/year
     var map<string, int> quarterCounts = map.new<string, int>()
 
@@ -83,12 +80,15 @@ if barstate.islast
         else
             map.put(quarterCounts, key, currentCount + 1)
 
-    // Build table
-    // Resize table based on number of quarters
+    // Build table with correct dimensions
     numQuarters = map.size(quarterCounts)
-    table.clear(statsTable, 0, 0, 2, numQuarters)
 
     if numQuarters > 0
+        // Delete old table and create new one with correct size (header + data rows)
+        if not na(statsTable)
+            table.delete(statsTable)
+        statsTable := table.new(position.top_right, 2, numQuarters + 1, border_width=1)
+
         // Header
         table.cell(statsTable, 0, 0, "Quarter", bgcolor=color.gray, text_color=color.white, text_size=size.small)
         table.cell(statsTable, 1, 0, "Count", bgcolor=color.gray, text_color=color.white, text_size=size.small)
@@ -106,4 +106,8 @@ if barstate.islast
             table.cell(statsTable, 1, row, str.tostring(count), bgcolor=color.white, text_color=color.black, text_size=size.small)
             row := row + 1
     else
+        // Delete old table and create simple message table
+        if not na(statsTable)
+            table.delete(statsTable)
+        statsTable := table.new(position.top_right, 1, 1, border_width=1)
         table.cell(statsTable, 0, 0, "No qualifying periods found", bgcolor=color.white, text_color=color.black, text_size=size.small)

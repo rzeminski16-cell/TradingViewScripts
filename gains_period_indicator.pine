@@ -15,34 +15,39 @@ var array<int> qualifyingPeriods = array.new_int()
 var array<int> qualifyingYears = array.new_int()
 var array<int> qualifyingQuarters = array.new_int()
 
-// Check if we can start looking for a new period
-canCheckPeriod = bar_index >= lastPeriodEnd
+// Check if we have enough bars and can check for a new period
+if bar_index >= periodLength - 1
+    // Calculate the bar index where we would START a period
+    potentialStartBar = bar_index - periodLength + 1
 
-if canCheckPeriod and bar_index >= periodLength - 1
-    // Get midpoint of current bar (start of potential period)
-    startMidpoint = midpoint
+    // Check if we can start looking for a new period (not in skip zone)
+    canCheckPeriod = potentialStartBar >= lastPeriodEnd
 
-    // Get midpoint of bar that is periodLength bars ahead
-    endMidpoint = request.security(syminfo.tickerid, timeframe.period, midpoint[-(periodLength - 1)])
+    if canCheckPeriod
+        // Get midpoint from periodLength bars ago (start of period)
+        startMidpoint = midpoint[periodLength - 1]
 
-    // Calculate gain percentage
-    gainPercent = ((endMidpoint - startMidpoint) / startMidpoint) * 100
+        // Get midpoint of current bar (end of period)
+        endMidpoint = midpoint
 
-    // Check if gain meets threshold
-    if gainPercent >= gainThreshold
-        // Mark this as a qualifying period
-        array.push(qualifyingPeriods, bar_index)
+        // Calculate gain percentage
+        gainPercent = ((endMidpoint - startMidpoint) / startMidpoint) * 100
 
-        // Get year and quarter
-        barYear = year(time)
-        barMonth = month(time)
-        barQuarter = math.floor((barMonth - 1) / 3) + 1
+        // Check if gain meets threshold
+        if gainPercent >= gainThreshold
+            // Mark the START bar as a qualifying period
+            array.push(qualifyingPeriods, potentialStartBar)
 
-        array.push(qualifyingYears, barYear)
-        array.push(qualifyingQuarters, barQuarter)
+            // Get year and quarter from the START bar
+            barYear = year(time[periodLength - 1])
+            barMonth = month(time[periodLength - 1])
+            barQuarter = math.floor((barMonth - 1) / 3) + 1
 
-        // Skip forward by periodLength days
-        lastPeriodEnd := bar_index + periodLength
+            array.push(qualifyingYears, barYear)
+            array.push(qualifyingQuarters, barQuarter)
+
+            // Skip forward by periodLength days from the start bar
+            lastPeriodEnd := potentialStartBar + periodLength
 
 // Determine if current bar is within a qualifying period
 isInQualifyingPeriod = false

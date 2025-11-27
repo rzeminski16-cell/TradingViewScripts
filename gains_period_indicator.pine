@@ -46,21 +46,25 @@ if bar_index >= periodLength - 1
             array.push(qualifyingYears, barYear)
             array.push(qualifyingQuarters, barQuarter)
 
+            // Draw a box to highlight the entire period
+            startTime = time[periodLength - 1]
+            endTime = time
+            boxTop = high[periodLength - 1]
+            boxBottom = low[periodLength - 1]
+
+            // Find highest high and lowest low in the period
+            for j = 0 to periodLength - 1
+                boxTop := math.max(boxTop, high[j])
+                boxBottom := math.min(boxBottom, low[j])
+
+            // Draw box with some padding
+            box.new(startTime, boxTop, endTime, boxBottom,
+                    border_color=na,
+                    bgcolor=highlightColor,
+                    extend=extend.none)
+
             // Skip forward by periodLength days from the start bar
             lastPeriodEnd := potentialStartBar + periodLength
-
-// Determine if current bar is within a qualifying period
-isInQualifyingPeriod = false
-if array.size(qualifyingPeriods) > 0
-    for i = 0 to array.size(qualifyingPeriods) - 1
-        periodStart = array.get(qualifyingPeriods, i)
-        periodEnd = periodStart + periodLength - 1
-        if bar_index >= periodStart and bar_index <= periodEnd
-            isInQualifyingPeriod := true
-            break
-
-// Apply background color
-bgcolor(isInQualifyingPeriod ? highlightColor : na)
 
 // Create table to show quarterly counts
 var table statsTable = na
